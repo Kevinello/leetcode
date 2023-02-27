@@ -85,27 +85,27 @@
 -- 
 --
 -- @lc code=start
-WITH salary_rank AS (
+WITH join_table as(
     SELECT
-        name,
-        salary,
-        dense_rank() OVER(
-            PARTITION BY departmentId
-            ORDER BY
-                salary DESC
-        ) as 'rank',
-        departmentId
+        e.name as Employee,
+        e.salary as Salary,
+        dense_rank() over(
+            partition by e.departmentId
+            order by
+                e.salary DESC
+        ) as salary_rank,
+        d.name as Department
     FROM
-        Employee
+        Employee as e
+        LEFT JOIN Department as d ON e.departmentId = d.id
 )
 SELECT
-    d.name AS Department,
-    s.name AS Employee,
-    s.salary AS Salary
+    Department,
+    Employee,
+    Salary
 FROM
-    salary_rank AS s
-    JOIN Department AS d ON s.departmentId = d.id
+    join_table
 WHERE
-    s.rank = 1;
+    salary_rank = 1;
 
 -- @lc code=end
